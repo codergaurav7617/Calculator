@@ -10,7 +10,7 @@ public class HomeController {
     @Autowired
     private Calculator calculator;
 
-    @PostMapping("/airthmetic")
+    @PostMapping("/arithmetic")
     public double airthmetic_operation(
             @RequestParam String fnumber,
             @RequestParam String operator,
