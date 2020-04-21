@@ -2,7 +2,8 @@ package springbootdemo.demo.models;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import springbootdemo.demo.exception.DivdeByZeroException;
-import java.util.Stack;
+
+import java.util.*;
 
 // comment for the project.
 
@@ -56,6 +57,13 @@ public class Calculator{
     public  double evaluateExpression(String expression) throws RuntimeException{
         Stack<Double> numbers = new Stack<>();
         Stack<Character> operations = new Stack<>();
+         final  Set<Character> SET_OF_CONSTANTS = Collections.unmodifiableSet(
+                new HashSet<Character>(Arrays.asList(
+                        '+',
+                        '-',
+                        '*',
+                        '/'
+              )));
 
         for(int i=0; i<expression.length();i++) {
 
@@ -67,7 +75,7 @@ public class Calculator{
                 double ans = Double.parseDouble(num);
                 numbers.push(ans);
             }
-            else if(isOperator(c)){
+            else if(SET_OF_CONSTANTS.contains(c)){
 
                 while(!operations.isEmpty() && precedence_of_operator(c)<=precedence_of_operator(operations.peek())){
                     double output = performOperation(numbers, operations);
@@ -134,12 +142,8 @@ public class Calculator{
             case '/':
                 if (a == 0)
                     throw new DivdeByZeroException("can't be divided by zero");
-                return b / a;
         }
         return 0;
     }
 
-    private   boolean isOperator(char c){
-        return (c=='+'||c=='-'||c=='/'||c=='*'||c=='^');
-    }
 }
