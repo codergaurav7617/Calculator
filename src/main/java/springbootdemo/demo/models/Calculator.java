@@ -23,7 +23,7 @@ public class Calculator{
 
     @Autowired
     private  Calculator calculator;
-
+    private int index=0;
     public double calculateResult(double first_number,double second_number,String operator) throws DivdeByZeroException {
 
         double result= 0;
@@ -54,38 +54,20 @@ public class Calculator{
     }
 
     public  double evaluateExpression(String expression) throws RuntimeException{
-
         Stack<Double> numbers = new Stack<>();
         Stack<Character> operations = new Stack<>();
 
-
         for(int i=0; i<expression.length();i++) {
+
             char c = expression.charAt(i);
 
             if(Character.isDigit(c) || (c=='.')){
-
-                String num="";
-                while (Character.isDigit(c) || (c=='.')) {
-                    num = num+c;
-                    i++;
-                    if(i < expression.length())
-                        c = expression.charAt(i);
-                    else
-                        break;
-                }
-                i--;
-
-                if (num.equals(".")){
-                    throw new NumberFormatException("please dont enter other than number");
-                }
+                String num=slice_number(expression);
+                index--;
                 double ans = Double.parseDouble(num);
                 numbers.push(ans);
             }
             else if(isOperator(c)){
-
-                if (i==0){
-                    throw new NumberFormatException("please enter the operator");
-                }
 
                 while(!operations.isEmpty() && precedence_of_operator(c)<=precedence_of_operator(operations.peek())){
                     double output = performOperation(numbers, operations);
@@ -105,7 +87,26 @@ public class Calculator{
         return numbers.pop();
     }
 
-    public  int precedence_of_operator(char c){
+    private String slice_number(String expression) throws NumberFormatException{
+        String num="";
+        char c=expression.charAt(index);
+        while (Character.isDigit(c) || (c=='.')) {
+            num = num+c;
+            index++;
+            if(index < expression.length())
+                c = expression.charAt(index);
+            else
+                break;
+        }
+
+        if (num.equals(".")){
+            throw new NumberFormatException("please dont enter other than number");
+        }
+
+        return num;
+    }
+
+    private   int precedence_of_operator(char c){
         switch (c){
             case '+':
             case '-':
@@ -119,7 +120,7 @@ public class Calculator{
         return -1;
     }
 
-    public  double performOperation(Stack<Double> numbers, Stack<Character> operations) {
+    private   double performOperation(Stack<Double> numbers, Stack<Character> operations) {
         double a = numbers.pop();
         double b = numbers.pop();
         char operation = operations.pop();
@@ -139,8 +140,7 @@ public class Calculator{
         return 0;
     }
 
-    public  boolean isOperator(char c){
+    private   boolean isOperator(char c){
         return (c=='+'||c=='-'||c=='/'||c=='*'||c=='^');
     }
-
 }
