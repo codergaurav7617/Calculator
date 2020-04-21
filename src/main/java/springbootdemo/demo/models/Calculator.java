@@ -55,6 +55,7 @@ public class Calculator{
     }
 
     public  double evaluateExpression(String expression) throws RuntimeException{
+        index=0;
         Stack<Double> numbers = new Stack<>();
         Stack<Character> operations = new Stack<>();
          final  Set<Character> SET_OF_CONSTANTS = Collections.unmodifiableSet(
@@ -65,10 +66,9 @@ public class Calculator{
                         '/'
               )));
 
-        for(int i=0; i<expression.length();i++) {
+        for(; index<expression.length();index++) {
 
-            char c = expression.charAt(i);
-
+            char c = expression.charAt(index);
             if(Character.isDigit(c) || (c=='.')){
                 String num=slice_number(expression);
                 index--;
