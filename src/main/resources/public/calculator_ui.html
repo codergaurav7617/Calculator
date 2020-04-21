@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+</head>
+<body>
+                    <form  method="post"  id="form2">
+                    <label for="exp">Enter the expression:</label><br>
+                    <input type="text" id="exp" name="exp"><br><br>
+                    </form>
+                    <button type="submit" form="form2" value="Submit">=</button>
+                    <br><br>
+
+                    <script>
+                        $('#form2')
+                            .ajaxForm({
+                                url : '/operation/continous', // url
+                                dataType : 'json',
+                                success : function (response) {
+                                    alert("calculated results is: " + response);
+                                    document.getElementById("exp").value=response;
+                                },
+                                error : function (response) {
+                                    alert(JSON.parse(response["responseText"]).errorMessage);
+                                    document.getElementById("exp").value="";
+                                }
+                            })
+                        ;
+                        console.log("Hello");
+                    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.js"></script>
+    <script src="http://malsup.github.com/jquery.form.js"></script>
+</head>
+<body>
+<form  method="post" id="form1">
+    <label for="first_number">First Number:</label><br>
+    <input type="text" id="first_number" name="fnumber"><br>
+    <br>
+    <select name="operator">
+        <option value="+" selected="${operator.equals('+')}">+</option>
+        <option value="-" selected="${operator.equals('-')}">-</option>
+        <option value="*" selected="${operator.equals('*')}">*</option>
+        <option value="/" selected="${operator.equals('/')}">/</option>
+        <option value="^" selected="${operator.equals('^')}">^</option>
+    </select>
+     <br>
+    <br>
+    <label for="second_number">Second Number:</label><br>
+    <input type="text" id="second_number" name="snumber">
+</form>
+<br>
+<button type="submit" form="form1" value="Submit">Submit</button>
+
+<script>
+    $('#form1')
+        .ajaxForm({
+            url : '/operation/airthmetic', // url
+            dataType : 'json',
+            success : function (response) {
+                alert("calculated results is: " + response);
+                document.getElementById("second_number").value="";
+                document.getElementById("first_number").value="";
+            },
+            error : function (response) {
+                alert(JSON.parse(response["responseText"]).errorMessage);
+                document.getElementById("second_number").value="";
+                document.getElementById("first_number").value="";
+            }
+        })
+    ;
+    console.log("Hello");
+</script>
+
+</body>
+</html>
