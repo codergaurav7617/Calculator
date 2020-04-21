@@ -133,8 +133,7 @@ public class Calculator{
                 return a * b;
             case '/':
                 if (a == 0)
-                    throw new
-                            UnsupportedOperationException("Cannot divide by zero");
+                    throw new DivdeByZeroException("can't be divided by zero");
                 return b / a;
         }
         return 0;
