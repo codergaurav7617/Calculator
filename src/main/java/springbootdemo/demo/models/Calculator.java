@@ -2,8 +2,7 @@ package springbootdemo.demo.models;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import springbootdemo.demo.exception.DivdeByZeroException;
-
-import java.util.*;
+import java.util.Stack;
 
 // comment for the project.
 
@@ -55,27 +54,22 @@ public class Calculator{
     }
 
     public  double evaluateExpression(String expression) throws RuntimeException{
-        index=0;
         Stack<Double> numbers = new Stack<>();
         Stack<Character> operations = new Stack<>();
-         final  Set<Character> SET_OF_CONSTANTS = Collections.unmodifiableSet(
-                new HashSet<Character>(Arrays.asList(
-                        '+',
-                        '-',
-                        '*',
-                        '/'
-              )));
+        HashSet<Character> set=new HashSet<>();
+        set.add('+');set.add('-');set.add('*');set.add('/');
 
-        for(; index<expression.length();index++) {
+        for(int i=0; i<expression.length();i++) {
 
-            char c = expression.charAt(index);
+            char c = expression.charAt(i);
+
             if(Character.isDigit(c) || (c=='.')){
                 String num=slice_number(expression);
                 index--;
                 double ans = Double.parseDouble(num);
                 numbers.push(ans);
             }
-            else if(SET_OF_CONSTANTS.contains(c)){
+            else if(isOperator(c)){
 
                 while(!operations.isEmpty() && precedence_of_operator(c)<=precedence_of_operator(operations.peek())){
                     double output = performOperation(numbers, operations);
@@ -142,8 +136,12 @@ public class Calculator{
             case '/':
                 if (a == 0)
                     throw new DivdeByZeroException("can't be divided by zero");
+                return b / a;
         }
         return 0;
     }
 
+    private   boolean isOperator(char c){
+        return (c=='+'||c=='-'||c=='/'||c=='*'||c=='^');
+    }
 }
