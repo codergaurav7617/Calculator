@@ -1,31 +1,28 @@
 package springbootdemo.demo.models;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import springbootdemo.demo.exception.DivdeByZeroException;
-import java.util.Stack;
+import springbootdemo.demo.exception.NumberFormatException;
 
-// comment for the project.
-
-    /*
-        1) More functions.
-        2) All the logic is present in Controller. Controller should only have routing logic, and delegate heavy work to other classes.
-        1) Use @Autowired, @Component for Singleton.
-        4) Junit should do for Calculator.
-     */
-
+import java.util.*;
 
 @Component
 public class Calculator{
 
-    private double first_number;
-    private double second_number;
-    private String operator;
+    private final static Set<Character> SET_OF_CONSTANTS = Collections.unmodifiableSet(
+            new HashSet<Character>(Arrays.asList(
+                    '+',
+                    '-',
+                    '*',
+                    '/'
+            )));
 
-    @Autowired
-    private  Calculator calculator;
+    private Stack<Double> numbers = new Stack<>();
+    private Stack<Character> operations = new Stack<>();
     private int index=0;
-    public double calculateResult(double first_number,double second_number,String operator) throws DivdeByZeroException {
-
+    private int curr_index=0;
+    public double calculateResult(double first_number,double second_number,String operator) throws DivdeByZeroException, NumberFormatException {
         double result= 0;
         switch (operator){
             case "+":
@@ -47,65 +44,62 @@ public class Calculator{
                 result=Math.pow(first_number,second_number);
                 break;
             default:
-                result = 0;
+                throw new NumberFormatException("Invalid Operator");
         }
 
         return result;
     }
 
-    public  double evaluateExpression(String expression) throws RuntimeException{
-        Stack<Double> numbers = new Stack<>();
-        Stack<Character> operations = new Stack<>();
-        HashSet<Character> set=new HashSet<>();
-        set.add('+');set.add('-');set.add('*');set.add('/');
-
-        for(int i=0; i<expression.length();i++) {
-
-            char c = expression.charAt(i);
-
+    public  double evaluateExpression(String expression) throws NumberFormatException,DivdeByZeroException{
+        String[] array_numbers=expression.split("[\\+\\-\\/\\*]{1}");
+        index=0;
+        for(; index<expression.length();index++) {
+            char c = expression.charAt(index);
             if(Character.isDigit(c) || (c=='.')){
-                String num=slice_number(expression);
+                slice_number(array_numbers);
                 index--;
-                double ans = Double.parseDouble(num);
-                numbers.push(ans);
             }
-            else if(isOperator(c)){
-
-                while(!operations.isEmpty() && precedence_of_operator(c)<=precedence_of_operator(operations.peek())){
-                    double output = performOperation(numbers, operations);
-                    numbers.push(output);
-                }
-                operations.push(c);
+            else if(SET_OF_CONSTANTS.contains(c)){
+                 performOperationOnStack(c,expression);
             }else{
                 throw new NumberFormatException("Please don't enter the alphabet");
             }
         }
+        double answer=finalResult();
+        return answer;
+    }
 
+    private double finalResult(){
         while(!operations.isEmpty()){
-            double output = performOperation(numbers, operations);
+            double output = performOperation();
             numbers.push(output);
         }
-
         return numbers.pop();
     }
 
-    private String slice_number(String expression) throws NumberFormatException{
-        String num="";
-        char c=expression.charAt(index);
-        while (Character.isDigit(c) || (c=='.')) {
-            num = num+c;
-            index++;
-            if(index < expression.length())
-                c = expression.charAt(index);
-            else
-                break;
+    private void performOperationOnStack(Character c,String expression) throws NumberFormatException{
+        if (index==0){
+            throw new NumberFormatException("please enter the operand first");
+        }else if(SET_OF_CONSTANTS.contains(expression.charAt(index-1))){
+            throw new NumberFormatException("Invalid Expression");
+        }
+        while(!operations.isEmpty() && precedence_of_operator(c)<=precedence_of_operator(operations.peek())){
+            double output = performOperation();
+            numbers.push(output);
+        }
+        operations.push(c);
+    }
+
+    private void slice_number(String [] array_numbers) throws NumberFormatException{
+        String num=array_numbers[curr_index];
+        index+=array_numbers[curr_index].length();
+        curr_index++;
+        try {
+            numbers.push( Double.parseDouble(num));
+        }catch (java.lang.NumberFormatException e){
+            throw new NumberFormatException("please do not enter other than number an operator");
         }
 
-        if (num.equals(".")){
-            throw new NumberFormatException("please dont enter other than number");
-        }
-
-        return num;
     }
 
     private   int precedence_of_operator(char c){
@@ -122,7 +116,7 @@ public class Calculator{
         return -1;
     }
 
-    private   double performOperation(Stack<Double> numbers, Stack<Character> operations) {
+    private   double performOperation() {
         double a = numbers.pop();
         double b = numbers.pop();
         char operation = operations.pop();
@@ -136,12 +130,8 @@ public class Calculator{
             case '/':
                 if (a == 0)
                     throw new DivdeByZeroException("can't be divided by zero");
-                return b / a;
         }
-        return 0;
-    }
 
-    private   boolean isOperator(char c){
-        return (c=='+'||c=='-'||c=='/'||c=='*'||c=='^');
+        return 0;
     }
 }
