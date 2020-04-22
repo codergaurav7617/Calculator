@@ -4,12 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import springbootdemo.demo.exception.DivdeByZeroException;
 import springbootdemo.demo.exception.NumberFormatException;
-
 import java.util.*;
 
 @Component
 public class Calculator{
-
     private final static Set<Character> SET_OF_CONSTANTS = Collections.unmodifiableSet(
             new HashSet<Character>(Arrays.asList(
                     '+',
@@ -20,8 +18,10 @@ public class Calculator{
 
     private Stack<Double> numbers = new Stack<>();
     private Stack<Character> operations = new Stack<>();
+
     private int index=0;
     private int curr_index=0;
+
     public double calculateResult(double first_number,double second_number,String operator) throws DivdeByZeroException, NumberFormatException {
         double result= 0;
         switch (operator){
@@ -97,9 +97,8 @@ public class Calculator{
         try {
             numbers.push( Double.parseDouble(num));
         }catch (java.lang.NumberFormatException e){
-            throw new NumberFormatException("please do not enter other than number an operator");
+            throw new NumberFormatException("please do not enter other than number and operator");
         }
-
     }
 
     private   int precedence_of_operator(char c){
