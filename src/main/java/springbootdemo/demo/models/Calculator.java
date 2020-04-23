@@ -1,6 +1,5 @@
 package springbootdemo.demo.models;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import springbootdemo.demo.exception.DivdeByZeroException;
 import springbootdemo.demo.exception.NumberFormatException;
@@ -18,9 +17,6 @@ public class Calculator{
 
     private Stack<Double> numbers = new Stack<>();
     private Stack<Character> operations = new Stack<>();
-
-    private int index=0;
-    private int curr_index=0;
 
     public double calculateResult(double first_number,double second_number,String operator) throws DivdeByZeroException, NumberFormatException {
         double result= 0;
@@ -46,21 +42,23 @@ public class Calculator{
             default:
                 throw new NumberFormatException("Invalid Operator");
         }
-
+        System.out.println(result);
         return result;
     }
 
     public  double evaluateExpression(String expression) throws NumberFormatException,DivdeByZeroException{
         String[] array_numbers=expression.split("[\\+\\-\\/\\*]{1}");
-        index=0;
+        int index=0;
+        int curr_index=0;
         for(; index<expression.length();index++) {
             char c = expression.charAt(index);
             if(Character.isDigit(c) || (c=='.')){
-                slice_number(array_numbers);
-                index--;
+                slice_number(array_numbers,curr_index);
+                index+=array_numbers[curr_index].length()-1;
+                curr_index++;
             }
             else if(SET_OF_CONSTANTS.contains(c)){
-                 performOperationOnStack(c,expression);
+                performOperationOnStack(c,expression,index);
             }else{
                 throw new NumberFormatException("Please don't enter the alphabet");
             }
@@ -77,7 +75,7 @@ public class Calculator{
         return numbers.pop();
     }
 
-    private void performOperationOnStack(Character c,String expression) throws NumberFormatException{
+    private void performOperationOnStack(Character c,String expression,int index) throws NumberFormatException{
         if (index==0){
             throw new NumberFormatException("please enter the operand first");
         }else if(SET_OF_CONSTANTS.contains(expression.charAt(index-1))){
@@ -90,9 +88,8 @@ public class Calculator{
         operations.push(c);
     }
 
-    private void slice_number(String [] array_numbers) throws NumberFormatException{
+    private void slice_number(String [] array_numbers,int curr_index) throws NumberFormatException{
         String num=array_numbers[curr_index];
-        index+=array_numbers[curr_index].length();
         curr_index++;
         try {
             numbers.push( Double.parseDouble(num));
@@ -130,7 +127,6 @@ public class Calculator{
                 if (a == 0)
                     throw new DivdeByZeroException("can't be divided by zero");
         }
-
         return 0;
     }
 }
