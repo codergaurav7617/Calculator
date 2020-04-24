@@ -1,5 +1,7 @@
 package springbootdemo.demo.models;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import springbootdemo.demo.Constants;
 import springbootdemo.demo.exception.DivideByZeroException;
 import springbootdemo.demo.exception.NumberFormatException;
 import java.util.*;
@@ -17,8 +19,16 @@ public class Calculator{
             )));
 
     private static final String invalid_expression="Invalid Expression";
+
     private static final String divide_by_zero="Divide by zero error";
+
     private static final String invalid_operator="Invalid Operator";
+
+    private static final String digitRegex = "^(\\d+\\.?\\d*)";
+
+    private static final String operatorRegex = "([\\+\\-\\/\\*]{1})";
+
+
 
     private Stack<Double> numbers = new Stack<>();
     private Stack<String> operations = new Stack<>();
@@ -48,7 +58,7 @@ public class Calculator{
             default:
                 throw new NumberFormatException(invalid_operator);
         }
-        
+
         return result;
     }
 
@@ -74,14 +84,14 @@ public class Calculator{
         double answer=finalResult();
         return answer;
     }
-    
-    // for the removal of the white space     
+
+    // for the removal of the white space
     private String removeWhiteSpace(String expression){
         Pattern patt = Pattern.compile("[\\s]");
         Matcher mat = patt.matcher(expression);
-        return mat.replaceAll(""); 
+        return mat.replaceAll("");
     }
-    
+
    // For checking whether the given expression is valid or not
     private boolean isValidExpression(String expression){
         for (int i=0;i<expression.length();i++){
@@ -114,6 +124,7 @@ public class Calculator{
         }
         operations.push(c);
     }
+
     // for finding out the precedence of the operator
     private   int precedence_of_operator(String c){
         switch (c){
@@ -128,7 +139,7 @@ public class Calculator{
         }
         return -1;
     }
-    
+
     // to perform the opeartion .
     private   double performOperation() {
         double a = numbers.pop();
@@ -156,12 +167,8 @@ public class Calculator{
     private static List<Literal> getLiterals(String str, int index) {
         if (str.isEmpty())return Collections.EMPTY_LIST;
         String substr = str.substring(index);
-        final String digitRegex = "^(\\d+\\.?\\d*)";
-        Pattern digitRegexPattern = Pattern.compile(digitRegex);
-        Matcher match = digitRegexPattern.matcher(substr);
-        final String operatorRegex = "([\\+\\-\\/\\*]{1})";
-        Pattern operatorRegexPattern = Pattern.compile(operatorRegex);
-        Matcher operatorRegexMatch = operatorRegexPattern.matcher(substr);
+        Matcher match = RegexMatcher(substr,Type.DIGIT);
+        Matcher operatorRegexMatch = RegexMatcher(substr, Type.OPERATOR);
         List<Literal> literals = new LinkedList<>();
         if (match.find()) {
             literals.add(new Literal(Type.DIGIT, match.group(1)));
@@ -173,6 +180,17 @@ public class Calculator{
         return literals;
     }
 
+    private static Matcher RegexMatcher(String substr,Type type){
+        Pattern RegexPattern = null;
+        if (type==Type.DIGIT){
+            RegexPattern = Pattern.compile(digitRegex);
+        }else{
+            RegexPattern=Pattern.compile(operatorRegex);
+        }
+        Matcher match = RegexPattern.matcher(substr);
+        return match;
+    }
+
     static class Literal {
         private final Type type;
         private final String value;
@@ -181,7 +199,7 @@ public class Calculator{
             this.type = type;
             this.value = value;
         }
-        
+
         @Override
         public String toString() {
             return "Literal{" +
@@ -190,8 +208,9 @@ public class Calculator{
                     '}';
         }
     }
-    
+
     enum Type {
         DIGIT, OPERATOR
     }
+
 }
