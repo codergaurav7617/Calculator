@@ -1,5 +1,4 @@
 package springbootdemo.demo.models;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import springbootdemo.demo.exception.DivdeByZeroException;
@@ -9,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 public class evaluateExpressionTest {
     private Calculator calculator;
-
     @BeforeEach
     public void setup() {
         calculator = new Calculator();
@@ -25,6 +23,10 @@ public class evaluateExpressionTest {
         assertEquals(6.0,calculator.evaluateExpression("1+2+3*2+3-6"));
     }
 
+    @Test
+    void testEvaluateExpressionOfBigNumber() throws NumberFormatException {
+        assertEquals(2.3111113E7,calculator.evaluateExpression("888888+22222222+3*2+3-6"));
+    }
 
     @Test
     void testEvaluateExpressionContaingAlphabet() {
@@ -32,9 +34,50 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("a+1+2");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("Please don't enter the alphabet", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());;
         }
     }
+
+    @Test
+    void testEvaluateExpressionAlphabetDivedByNumberAndOperator() {
+        try {
+            calculator.evaluateExpression("a/1+");
+            fail();
+        } catch (NumberFormatException e) {
+            assertEquals("Invalid Expression", e.getMessage());;
+        }
+    }
+
+    @Test
+    void testEvaluateExpressionAlphabetDivedByNumber() {
+        try {
+            calculator.evaluateExpression("a/1");
+            fail();
+        } catch (NumberFormatException e) {
+            assertEquals("Invalid Expression", e.getMessage());;
+        }
+    }
+
+    @Test
+    void testExpression() {
+        try {
+            calculator.evaluateExpression("a/1.0");
+            fail();
+        } catch (NumberFormatException e) {
+            assertEquals("Invalid Expression", e.getMessage());;
+        }
+    }
+
+    @Test
+    void testEvaluateExpressionOHavingBigNumber() throws NumberFormatException {
+        assertEquals(2.4444445286404378E20,calculator.evaluateExpression("1+244444444444444444444+344444444*24444+3444-644444"));
+    }
+
+    @Test
+    void testEvaluateExpressionOnlyOneDifferentOfOperatorAddition() throws NumberFormatException {
+        assertEquals(2.5717064978275E13,calculator.evaluateExpression("1444444444+25555555555555+6*26677866544+6666666-8887654"));
+    }
+
 
     @Test
     public void testEvaluateExpressionContaingDivideByZero() {
@@ -62,7 +105,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("+");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("please enter the operand first", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());;
         }
     }
 
@@ -72,26 +115,6 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression(".");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("please do not enter other than number an operator", e.getMessage());;
-        }
-    }
-
-    @Test
-    public void testEvaluateExpressionContainingTwoOperatorAdjacent(){
-        try {
-            calculator.evaluateExpression("1+2+3++");
-            fail();
-        } catch (NumberFormatException e) {
-            assertEquals("Invalid Expression", e.getMessage());;
-        }
-    }
-
-    @Test
-    public void testEvaluateExpressionContainingTwoOperatorAdjacentAndADot(){
-        try {
-            calculator.evaluateExpression("1+4*4+3-+.");
-            fail();
-        } catch (NumberFormatException e) {
             assertEquals("Invalid Expression", e.getMessage());;
         }
     }
@@ -99,7 +122,7 @@ public class evaluateExpressionTest {
     @Test
     public void testEvaluateExpressionContainingAdjacentOperatorAndTheNumber(){
         try {
-            calculator.evaluateExpression("1+4+++34");
+            calculator.evaluateExpression("1+4+3+4ff+34");
             fail();
         } catch (NumberFormatException e) {
             assertEquals("Invalid Expression", e.getMessage());;
@@ -112,8 +135,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("1+4+34aa");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("please do not enter other than number an operator", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());;
         }
     }
-
 }

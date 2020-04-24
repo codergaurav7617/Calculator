@@ -1,9 +1,10 @@
 package springbootdemo.demo.models;
-
 import org.springframework.stereotype.Component;
 import springbootdemo.demo.exception.DivdeByZeroException;
 import springbootdemo.demo.exception.NumberFormatException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class Calculator{
@@ -16,7 +17,7 @@ public class Calculator{
             )));
 
     private Stack<Double> numbers = new Stack<>();
-    private Stack<Character> operations = new Stack<>();
+    private Stack<String> operations = new Stack<>();
 
     public double calculateResult(double first_number,double second_number,String operator) throws DivdeByZeroException, NumberFormatException {
         double result= 0;
@@ -42,45 +43,57 @@ public class Calculator{
             default:
                 throw new NumberFormatException("Invalid Operator");
         }
-        System.out.println(result);
+
         return result;
     }
 
     public  double evaluateExpression(String expression) throws NumberFormatException,DivdeByZeroException{
-        String[] array_numbers=expression.split("[\\+\\-\\/\\*]{1}");
-        int index=0;
-        int curr_index=0;
-        for(; index<expression.length();index++) {
-            char c = expression.charAt(index);
-            if(Character.isDigit(c) || (c=='.')){
-                slice_number(array_numbers,curr_index);
-                index+=array_numbers[curr_index].length()-1;
-                curr_index++;
+        boolean isvalid=isValidExpression(expression);
+
+        if (!isvalid){
+            throw new NumberFormatException("Invalid Expression");
+        }
+
+        List<Literal> literals=getArrayOfString(expression);
+        for(int index =0; index<literals.size();index++) {
+            if(literals.get(index).type== Type.DIGIT){
+                    numbers.push( Double.parseDouble(literals.get(index).value));
             }
-            else if(SET_OF_CONSTANTS.contains(c)){
-                performOperationOnStack(c,expression,index);
-            }else{
-                throw new NumberFormatException("Please don't enter the alphabet");
+            else {
+                performOperationOnStack(literals.get(index).value);
             }
         }
+
         double answer=finalResult();
         return answer;
     }
 
-    private double finalResult(){
+    private boolean isValidExpression(String expression){
+        for (int i=0;i<expression.length();i++){
+            char c=expression.charAt(i);
+            if  (!(Character.isDigit(c) || SET_OF_CONSTANTS.contains(c))){
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    private double finalResult() throws NumberFormatException {
         while(!operations.isEmpty()){
+            if (numbers.isEmpty()){
+                throw new NumberFormatException("Invalid Expression");
+            }
             double output = performOperation();
             numbers.push(output);
+        }
+        if (numbers.isEmpty()){
+            throw new NumberFormatException("Invalid Expression");
         }
         return numbers.pop();
     }
 
-    private void performOperationOnStack(Character c,String expression,int index) throws NumberFormatException{
-        if (index==0){
-            throw new NumberFormatException("please enter the operand first");
-        }else if(SET_OF_CONSTANTS.contains(expression.charAt(index-1))){
-            throw new NumberFormatException("Invalid Expression");
-        }
+    private void performOperationOnStack(String c) throws NumberFormatException{
         while(!operations.isEmpty() && precedence_of_operator(c)<=precedence_of_operator(operations.peek())){
             double output = performOperation();
             numbers.push(output);
@@ -88,25 +101,15 @@ public class Calculator{
         operations.push(c);
     }
 
-    private void slice_number(String [] array_numbers,int curr_index) throws NumberFormatException{
-        String num=array_numbers[curr_index];
-        curr_index++;
-        try {
-            numbers.push( Double.parseDouble(num));
-        }catch (java.lang.NumberFormatException e){
-            throw new NumberFormatException("please do not enter other than number and operator");
-        }
-    }
-
-    private   int precedence_of_operator(char c){
+    private   int precedence_of_operator(String c){
         switch (c){
-            case '+':
-            case '-':
+            case "+":
+            case "-":
                 return 1;
-            case '*':
-            case '/':
+            case "*":
+            case "/":
                 return 2;
-            case '^':
+            case "^":
                 return 3;
         }
         return -1;
@@ -115,18 +118,64 @@ public class Calculator{
     private   double performOperation() {
         double a = numbers.pop();
         double b = numbers.pop();
-        char operation = operations.pop();
+        String operation = operations.pop();
         switch (operation) {
-            case '+':
+            case "+":
                 return a + b;
-            case '-':
+            case "-":
                 return b - a;
-            case '*':
+            case "*":
                 return a * b;
-            case '/':
+            case "/":
                 if (a == 0)
                     throw new DivdeByZeroException("can't be divided by zero");
         }
         return 0;
+    }
+
+    public static List<Literal> getArrayOfString(String a) {
+        List<Literal> literals = getLiterals(a, 0);
+        return literals;
+    }
+
+    private static List<Literal> getLiterals(String str, int index) {
+        if (str.isEmpty())return Collections.EMPTY_LIST;
+        String substr = str.substring(index);
+        String digitRegex = "^(\\d+\\.?\\d*)";
+        Pattern digitRegexPattern = Pattern.compile(digitRegex);
+        Matcher match = digitRegexPattern.matcher(substr);
+        String operatorRegex = "([\\+\\-\\/\\*]{1})";
+        Pattern operatorRegexPattern = Pattern.compile(operatorRegex);
+        Matcher operatorRegexMatch = operatorRegexPattern.matcher(substr);
+        List<Literal> literals = new LinkedList<>();
+        if (match.find()) {
+            literals.add(new Literal(Type.DIGIT, match.group(1)));
+            literals.addAll(getLiterals(substr, match.end()));
+        } else if (operatorRegexMatch.find()) {
+            literals.add(new Literal(Type.OPERATOR, operatorRegexMatch.group(1)));
+            literals.addAll(getLiterals(substr, operatorRegexMatch.end()));
+        }
+        return literals;
+    }
+
+    static class Literal {
+        private final Type type;
+        private final String value;
+
+        public Literal(Type type, String value) {
+            this.type = type;
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return "Literal{" +
+                    "type=" + type +
+                    ", value='" + value + '\'' +
+                    '}';
+        }
+    }
+    enum Type {
+        DIGIT, OPERATOR
     }
 }
