@@ -1,7 +1,7 @@
 package springbootdemo.demo.models;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import springbootdemo.demo.exception.DivdeByZeroException;
+import springbootdemo.demo.exception.DivideByZeroException;
 import springbootdemo.demo.exception.NumberFormatException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -16,6 +16,11 @@ public class evaluateExpressionTest {
     @Test
     void testEvaluateExpressionOnlyOneKindOfOperator() throws NumberFormatException {
         assertEquals(6.0,calculator.evaluateExpression("1+2+3"));
+    }
+
+    @Test
+    void testEvaluateExpressionHavingWhiteSpace() throws NumberFormatException {
+        assertEquals(6.0,calculator.evaluateExpression("1 + 2 + 3"));
     }
 
     @Test
@@ -80,12 +85,18 @@ public class evaluateExpressionTest {
 
 
     @Test
+    void testEvaluateExpressionHavingDecimal() throws NumberFormatException {
+        assertEquals(2.5717064978275254E13,calculator.evaluateExpression("1444444444.25364775757+25555555555555+6*26677866544+6666666-8887654"));
+    }
+
+
+    @Test
     public void testEvaluateExpressionContaingDivideByZero() {
         try {
             calculator.evaluateExpression("1+2+3*1/0");
             fail();
-        } catch (NumberFormatException | DivdeByZeroException e) {
-            assertEquals("can't be divided by zero", e.getMessage());;
+        } catch (NumberFormatException | DivideByZeroException e) {
+            assertEquals("Divide by zero error", e.getMessage());;
         }
     }
 
@@ -94,8 +105,8 @@ public class evaluateExpressionTest {
         try {
             calculator.evaluateExpression("1/0");
             fail();
-        } catch (DivdeByZeroException | NumberFormatException e) {
-            assertEquals("can't be divided by zero", e.getMessage());;
+        } catch (DivideByZeroException | NumberFormatException e) {
+            assertEquals("Divide by zero error", e.getMessage());;
         }
     }
 
@@ -122,7 +133,7 @@ public class evaluateExpressionTest {
     @Test
     public void testEvaluateExpressionContainingAdjacentOperatorAndTheNumber(){
         try {
-            calculator.evaluateExpression("1+4+3+4ff+34");
+            calculator.evaluateExpression("1+4.134+3+4ff+34");
             fail();
         } catch (NumberFormatException e) {
             assertEquals("Invalid Expression", e.getMessage());;

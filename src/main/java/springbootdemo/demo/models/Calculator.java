@@ -1,6 +1,6 @@
 package springbootdemo.demo.models;
 import org.springframework.stereotype.Component;
-import springbootdemo.demo.exception.DivdeByZeroException;
+import springbootdemo.demo.exception.DivideByZeroException;
 import springbootdemo.demo.exception.NumberFormatException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -16,10 +16,15 @@ public class Calculator{
                     '/'
             )));
 
+    private static final String invalid_expression="Invalid Expression";
+    private static final String divide_by_zero="Divide by zero error";
+    private static final String invalid_operator="Invalid Operator";
+
     private Stack<Double> numbers = new Stack<>();
     private Stack<String> operations = new Stack<>();
 
-    public double calculateResult(double first_number,double second_number,String operator) throws DivdeByZeroException, NumberFormatException {
+    // used for the performing the airthmetic operation
+    public double calculateResult(double first_number,double second_number,String operator) throws DivideByZeroException, NumberFormatException {
         double result= 0;
         switch (operator){
             case "+":
@@ -33,7 +38,7 @@ public class Calculator{
                 break;
             case "/":
                 if(second_number==0){
-                    throw new DivdeByZeroException("Divide by zero error");
+                    throw new DivideByZeroException(divide_by_zero);
                 }
                 result = first_number/second_number;
                 break;
@@ -41,19 +46,21 @@ public class Calculator{
                 result=Math.pow(first_number,second_number);
                 break;
             default:
-                throw new NumberFormatException("Invalid Operator");
+                throw new NumberFormatException(invalid_operator);
         }
-
+        
         return result;
     }
 
-    public  double evaluateExpression(String expression) throws NumberFormatException,DivdeByZeroException{
+    // used for the evaluating the expression
+    public  double evaluateExpression(String expression) throws NumberFormatException, DivideByZeroException {
+        expression=removeWhiteSpace(expression);
         boolean isvalid=isValidExpression(expression);
-
         if (!isvalid){
-            throw new NumberFormatException("Invalid Expression");
+            throw new NumberFormatException(invalid_expression);
         }
 
+        // converting the String expression into the String array using the regex
         List<Literal> literals=getArrayOfString(expression);
         for(int index =0; index<literals.size();index++) {
             if(literals.get(index).type== Type.DIGIT){
@@ -67,28 +74,35 @@ public class Calculator{
         double answer=finalResult();
         return answer;
     }
-
+    
+    // for the removal of the white space     
+    private String removeWhiteSpace(String expression){
+        Pattern patt = Pattern.compile("[\\s]");
+        Matcher mat = patt.matcher(expression);
+        return mat.replaceAll(""); 
+    }
+    
+   // For checking whether the given expression is valid or not
     private boolean isValidExpression(String expression){
         for (int i=0;i<expression.length();i++){
             char c=expression.charAt(i);
-            if  (!(Character.isDigit(c) || SET_OF_CONSTANTS.contains(c))){
+            if  (!(Character.isDigit(c) || SET_OF_CONSTANTS.contains(c) || (c=='.'))){
                 return false;
             }
         }
         return true;
     }
 
-
     private double finalResult() throws NumberFormatException {
         while(!operations.isEmpty()){
             if (numbers.isEmpty()){
-                throw new NumberFormatException("Invalid Expression");
+                throw new NumberFormatException(invalid_expression);
             }
             double output = performOperation();
             numbers.push(output);
         }
         if (numbers.isEmpty()){
-            throw new NumberFormatException("Invalid Expression");
+            throw new NumberFormatException(invalid_expression);
         }
         return numbers.pop();
     }
@@ -100,7 +114,7 @@ public class Calculator{
         }
         operations.push(c);
     }
-
+    // for finding out the precedence of the operator
     private   int precedence_of_operator(String c){
         switch (c){
             case "+":
@@ -114,7 +128,8 @@ public class Calculator{
         }
         return -1;
     }
-
+    
+    // to perform the opeartion .
     private   double performOperation() {
         double a = numbers.pop();
         double b = numbers.pop();
@@ -128,7 +143,7 @@ public class Calculator{
                 return a * b;
             case "/":
                 if (a == 0)
-                    throw new DivdeByZeroException("can't be divided by zero");
+                    throw new DivideByZeroException(divide_by_zero);
         }
         return 0;
     }
@@ -141,10 +156,10 @@ public class Calculator{
     private static List<Literal> getLiterals(String str, int index) {
         if (str.isEmpty())return Collections.EMPTY_LIST;
         String substr = str.substring(index);
-        String digitRegex = "^(\\d+\\.?\\d*)";
+        final String digitRegex = "^(\\d+\\.?\\d*)";
         Pattern digitRegexPattern = Pattern.compile(digitRegex);
         Matcher match = digitRegexPattern.matcher(substr);
-        String operatorRegex = "([\\+\\-\\/\\*]{1})";
+        final String operatorRegex = "([\\+\\-\\/\\*]{1})";
         Pattern operatorRegexPattern = Pattern.compile(operatorRegex);
         Matcher operatorRegexMatch = operatorRegexPattern.matcher(substr);
         List<Literal> literals = new LinkedList<>();
@@ -166,7 +181,7 @@ public class Calculator{
             this.type = type;
             this.value = value;
         }
-
+        
         @Override
         public String toString() {
             return "Literal{" +
@@ -175,6 +190,7 @@ public class Calculator{
                     '}';
         }
     }
+    
     enum Type {
         DIGIT, OPERATOR
     }
