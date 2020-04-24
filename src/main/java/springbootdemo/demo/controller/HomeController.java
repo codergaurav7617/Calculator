@@ -35,7 +35,7 @@ public class HomeController {
          return Double.parseDouble(number);
     }
 
-    @RequestMapping("/continous")
+    @RequestMapping("/continuous")
     public double evaluate_expression(
             @RequestParam String exp
     ) throws NumberFormatException {

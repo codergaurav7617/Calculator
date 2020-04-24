@@ -66,7 +66,7 @@ public class Calculator{
 
         return result;
     }
-
+    
     // used for the evaluating the expression
     public  double evaluateExpression(String expression) throws NumberFormatException, DivideByZeroException {
         // used for the removal of the white space from the expression
@@ -88,14 +88,7 @@ public class Calculator{
         double answer=finalResult();
         return answer;
     }
-
-    // for the removal of the white space
-    private String removeWhiteSpace(String expression){
-        Pattern patt = Pattern.compile("[\\s]");
-        Matcher mat = patt.matcher(expression);
-        return mat.replaceAll("");
-    }
-
+    
    // For checking whether the given expression is valid or not
     private boolean isValidExpression(String expression){
         for (int i=0;i<expression.length();i++){
@@ -168,31 +161,31 @@ public class Calculator{
         return literals;
     }
 
-    private static List<Literal> getLiterals(String str, int index) {
-        if (str.isEmpty())return Collections.EMPTY_LIST;
-        String substr = str.substring(index);
-        Matcher match = RegexMatcher(substr,Type.DIGIT);
-        Matcher operatorRegexMatch = RegexMatcher(substr, Type.OPERATOR);
+    private static List<Literal> getLiterals(String expression, int index) {
+        if (expression.isEmpty())return Collections.EMPTY_LIST;
+        String remainingExpression = expression.substring(index);
+        Matcher match = RegexMatcher(remainingExpression,Type.DIGIT);
+        Matcher operatorRegexMatch = RegexMatcher(remainingExpression, Type.OPERATOR);
         List<Literal> literals = new LinkedList<>();
         if (match.find()) {
             literals.add(new Literal(Type.DIGIT, match.group(1)));
-            literals.addAll(getLiterals(substr, match.end()));
+            literals.addAll(getLiterals(remainingExpression, match.end()));
         } else if (operatorRegexMatch.find()) {
             literals.add(new Literal(Type.OPERATOR, operatorRegexMatch.group(1)));
-            literals.addAll(getLiterals(substr, operatorRegexMatch.end()));
+            literals.addAll(getLiterals(remainingExpression, operatorRegexMatch.end()));
         }
         return literals;
     }
 
-    private static Matcher RegexMatcher(String substr,Type type){
+    private static Matcher RegexMatcher(String expression,Type type){
 
         Matcher match = null;
         if (type==Type.DIGIT){
-            match=digitRegexPattern.matcher(substr);
+            match=digitRegexPattern.matcher(expression);
         }else if (type==Type.OPERATOR){
-            match=operatorRegexPattern.matcher(substr);
+            match=operatorRegexPattern.matcher(expression);
         }else{
-            match=spaceRegexPattern.matcher(substr);
+            match=spaceRegexPattern.matcher(expression);
         }
 
         return match;
