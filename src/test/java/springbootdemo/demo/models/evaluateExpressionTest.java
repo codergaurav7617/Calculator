@@ -36,7 +36,6 @@ public class evaluateExpressionTest {
     }
 
 
-
     @Test
     void testEvaluateExpressionHavingWhiteSpaceInTheMiddleOfTheExpression() throws NumberFormatException {
         assertEquals(6.0,calculator.evaluateExpression("1        + 2 + 3"));
@@ -60,7 +59,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("a+1+2");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("Invalid Expression", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());
         }
     }
 
@@ -70,7 +69,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("a/1+");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("Invalid Expression", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());
         }
     }
 
@@ -80,7 +79,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("a/1");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("Invalid Expression", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());
         }
     }
 
@@ -90,7 +89,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("a/1.0");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("Invalid Expression", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());
         }
     }
 
@@ -117,7 +116,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("1+2+3*1/0");
             fail();
         } catch (NumberFormatException | DivideByZeroException e) {
-            assertEquals("Divide by zero error", e.getMessage());;
+            assertEquals("Divide by zero error", e.getMessage());
         }
     }
 
@@ -127,7 +126,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("1/0");
             fail();
         } catch (DivideByZeroException | NumberFormatException e) {
-            assertEquals("Divide by zero error", e.getMessage());;
+            assertEquals("Divide by zero error", e.getMessage());
         }
     }
 
@@ -137,7 +136,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("+");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("Invalid Expression", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());
         }
     }
 
@@ -147,7 +146,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression(".");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("Invalid Expression", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());
         }
     }
 
@@ -157,7 +156,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("1+4.134+3+4ff+34");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("Invalid Expression", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());
         }
     }
 
@@ -167,7 +166,7 @@ public class evaluateExpressionTest {
             calculator.evaluateExpression("1+4+34aa");
             fail();
         } catch (NumberFormatException e) {
-            assertEquals("Invalid Expression", e.getMessage());;
+            assertEquals("Invalid Expression", e.getMessage());
         }
     }
 }

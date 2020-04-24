@@ -24,7 +24,8 @@ public class HomeController {
         first_number = verifyNumber(fnumber);
         second_number = verifyNumber(snumber);
 
-        double result = calculator.calculateResult(first_number,
+        double result;
+        result = calculator.calculateResult(first_number,
                 second_number,
                 operator
         );
@@ -39,7 +40,8 @@ public class HomeController {
     public double evaluate_expression(
             @RequestParam String exp
     ) throws NumberFormatException {
-        double  answer = calculator.evaluateExpression(exp);
+        double  answer;
+        answer = calculator.evaluateExpression(exp);
         return answer;
     }
 }

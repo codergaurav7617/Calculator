@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 @Component
 public class Calculator{
     private final static Set<Character> SET_OF_CONSTANTS = Collections.unmodifiableSet(
-            new HashSet<Character>(Arrays.asList(
+            new HashSet<>(Arrays.asList(
                     '+',
                     '-',
                     '*',
@@ -34,13 +34,13 @@ public class Calculator{
 
     private static final Pattern spaceRegexPattern = Pattern.compile(spaceRegex);
 
-    private Stack<Double> numbers = new Stack<>();
+    private final Stack<Double> numbers = new Stack<>();
 
-    private Stack<String> operations = new Stack<>();
+    private final Stack<String> operations = new Stack<>();
 
     // used for the performing the airthmetic operation
     public double calculateResult(double first_number,double second_number,String operator) throws DivideByZeroException, NumberFormatException {
-        double result= 0;
+        double result;
         switch (operator){
             case "+":
                 result = first_number+second_number;
@@ -77,16 +77,14 @@ public class Calculator{
         }
         // converting the String expression into the String array using the regex
         List<Literal> literals=getArrayOfString(expression);
-        for(int index =0; index<literals.size();index++) {
-            if(literals.get(index).type== Type.DIGIT){
-                    numbers.push( Double.parseDouble(literals.get(index).value));
-            }
-            else {
-                performOperationOnStack(literals.get(index).value);
+        for (Literal literal : literals) {
+            if (literal.type == Type.DIGIT) {
+                numbers.push(Double.parseDouble(literal.value));
+            } else {
+                performOperationOnStack(literal.value);
             }
         }
-        double answer=finalResult();
-        return answer;
+        return finalResult();
     }
 
    // For checking whether the given expression is valid or not
@@ -114,7 +112,7 @@ public class Calculator{
         return numbers.pop();
     }
 
-    private void performOperationOnStack(String c) throws NumberFormatException{
+    private void performOperationOnStack(String c){
         while(!operations.isEmpty() && precedence_of_operator(c)<=precedence_of_operator(operations.peek())){
             double output = performOperation();
             numbers.push(output);
@@ -157,12 +155,13 @@ public class Calculator{
     }
 
     public static List<Literal> getArrayOfString(String a) {
-        List<Literal> literals = getLiterals(a, 0);
-        return literals;
+        return getLiterals(a, 0);
     }
 
     private static List<Literal> getLiterals(String expression, int index) {
-        if (expression.isEmpty())return Collections.EMPTY_LIST;
+        if (expression.isEmpty()) {
+            return new LinkedList<>();
+        }
         String remainingExpression = expression.substring(index);
         Matcher match = regexMatcher(remainingExpression,Type.DIGIT);
         Matcher operatorRegexMatch = regexMatcher(remainingExpression, Type.OPERATOR);
@@ -179,7 +178,7 @@ public class Calculator{
 
     private static Matcher regexMatcher(String expression,Type type){
 
-        Matcher match = null;
+        Matcher match;
         if (type==Type.DIGIT){
             match=digitRegexPattern.matcher(expression);
         }else if (type==Type.OPERATOR){
