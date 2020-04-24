@@ -66,11 +66,11 @@ public class Calculator{
 
         return result;
     }
-    
+
     // used for the evaluating the expression
     public  double evaluateExpression(String expression) throws NumberFormatException, DivideByZeroException {
         // used for the removal of the white space from the expression
-        expression=RegexMatcher(expression, Type.WHITE_SPACE).replaceAll("");
+        expression=regexMatcher(expression, Type.WHITE_SPACE).replaceAll("");
         boolean isvalid=isValidExpression(expression);
         if (!isvalid){
             throw new NumberFormatException(invalid_expression);
@@ -88,7 +88,7 @@ public class Calculator{
         double answer=finalResult();
         return answer;
     }
-    
+
    // For checking whether the given expression is valid or not
     private boolean isValidExpression(String expression){
         for (int i=0;i<expression.length();i++){
@@ -164,8 +164,8 @@ public class Calculator{
     private static List<Literal> getLiterals(String expression, int index) {
         if (expression.isEmpty())return Collections.EMPTY_LIST;
         String remainingExpression = expression.substring(index);
-        Matcher match = RegexMatcher(remainingExpression,Type.DIGIT);
-        Matcher operatorRegexMatch = RegexMatcher(remainingExpression, Type.OPERATOR);
+        Matcher match = regexMatcher(remainingExpression,Type.DIGIT);
+        Matcher operatorRegexMatch = regexMatcher(remainingExpression, Type.OPERATOR);
         List<Literal> literals = new LinkedList<>();
         if (match.find()) {
             literals.add(new Literal(Type.DIGIT, match.group(1)));
@@ -177,7 +177,7 @@ public class Calculator{
         return literals;
     }
 
-    private static Matcher RegexMatcher(String expression,Type type){
+    private static Matcher regexMatcher(String expression,Type type){
 
         Matcher match = null;
         if (type==Type.DIGIT){
