@@ -23,6 +23,27 @@ public class evaluateExpressionTest {
         assertEquals(6.0,calculator.evaluateExpression("1 + 2 + 3"));
     }
 
+
+    @Test
+    void testEvaluateExpressionHavingWhiteSpaceAtTheBeginigOfTheExpression() throws NumberFormatException {
+        assertEquals(6.0,calculator.evaluateExpression("   1 + 2 + 3"));
+    }
+
+
+    @Test
+    void testEvaluateExpressionHavingWhiteSpaceAtTheEndOfTheExpression() throws NumberFormatException {
+        assertEquals(267903.0,calculator.evaluateExpression("   1 + 267899 + 3            "));
+    }
+
+
+
+    @Test
+    void testEvaluateExpressionHavingWhiteSpaceInTheMiddleOfTheExpression() throws NumberFormatException {
+        assertEquals(6.0,calculator.evaluateExpression("1        + 2 + 3"));
+    }
+
+
+
     @Test
     void testEvaluateExpressionOnlyOneDifferentOfOperator() throws NumberFormatException {
         assertEquals(6.0,calculator.evaluateExpression("1+2+3*2+3-6"));

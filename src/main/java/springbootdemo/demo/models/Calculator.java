@@ -28,7 +28,14 @@ public class Calculator{
 
     private static final String spaceRegex = "[\\s]";
 
+    private static final Pattern digitRegexPattern = Pattern.compile(digitRegex);
+
+    private static final Pattern operatorRegexPattern = Pattern.compile(operatorRegex);
+
+    private static final Pattern spaceRegexPattern = Pattern.compile(spaceRegex);
+
     private Stack<Double> numbers = new Stack<>();
+
     private Stack<String> operations = new Stack<>();
 
     // used for the performing the airthmetic operation
@@ -178,15 +185,16 @@ public class Calculator{
     }
 
     private static Matcher RegexMatcher(String substr,Type type){
-        Pattern RegexPattern = null;
+
+        Matcher match = null;
         if (type==Type.DIGIT){
-            RegexPattern = Pattern.compile(digitRegex);
+            match=digitRegexPattern.matcher(substr);
         }else if (type==Type.OPERATOR){
-            RegexPattern=Pattern.compile(operatorRegex);
+            match=operatorRegexPattern.matcher(substr);
         }else{
-            RegexPattern=Pattern.compile(spaceRegex);
+            match=spaceRegexPattern.matcher(substr);
         }
-        Matcher match = RegexPattern.matcher(substr);
+
         return match;
     }
 
