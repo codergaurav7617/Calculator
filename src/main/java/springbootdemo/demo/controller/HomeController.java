@@ -1,8 +1,9 @@
 package springbootdemo.demo.controller;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import springbootdemo.demo.exception.DivdeByZeroException;
-import springbootdemo.demo.models.Calculator;
+import  org.springframework.beans.factory.annotation.Autowired;
+import  org.springframework.web.bind.annotation.*;
+import  springbootdemo.demo.exception.DivideByZeroException;
+import  springbootdemo.demo.exception.NumberFormatException;
+import  springbootdemo.demo.models.Calculator;
 
 @RestController
 @RequestMapping("/operation")
@@ -11,26 +12,17 @@ public class HomeController {
     private Calculator calculator;
 
     @PostMapping("/arithmetic")
-    public double airthmetic_operation(
+    public double arithmetic_operation(
             @RequestParam String fnumber,
             @RequestParam String operator,
             @RequestParam String snumber
-
-    ) throws DivdeByZeroException {
+    ) throws DivideByZeroException, NumberFormatException {
 
         double first_number;
         double second_number;
 
-        try {
-            first_number = Double.parseDouble(fnumber);
-        } catch (NumberFormatException ex) {
-            throw new NumberFormatException("Please don't enter the alphabet");
-        }
-        try {
-            second_number = Double.parseDouble(snumber);
-        } catch (NumberFormatException ex) {
-            throw new NumberFormatException("Please don't enter the alphabet");
-        }
+        first_number = verifyNumber(fnumber);
+        second_number = verifyNumber(snumber);
 
         double result = calculator.calculateResult(first_number,
                 second_number,
@@ -39,11 +31,15 @@ public class HomeController {
         return result;
     }
 
+    public double verifyNumber(String number) throws NumberFormatException {
+         return Double.parseDouble(number);
+    }
+
     @RequestMapping("/continous")
     public double evaluate_expression(
             @RequestParam String exp
-    ) {
-         double  answer = calculator.evaluateExpression(exp);
-         return answer;
+    ) throws NumberFormatException {
+        double  answer = calculator.evaluateExpression(exp);
+        return answer;
     }
-  }
+}
