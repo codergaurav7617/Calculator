@@ -1,7 +1,5 @@
 package springbootdemo.demo.models;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import springbootdemo.demo.Constants;
 import springbootdemo.demo.exception.DivideByZeroException;
 import springbootdemo.demo.exception.NumberFormatException;
 import java.util.*;
@@ -28,7 +26,7 @@ public class Calculator{
 
     private static final String operatorRegex = "([\\+\\-\\/\\*]{1})";
 
-
+    private static final String spaceRegex = "[\\s]";
 
     private Stack<Double> numbers = new Stack<>();
     private Stack<String> operations = new Stack<>();
@@ -64,12 +62,12 @@ public class Calculator{
 
     // used for the evaluating the expression
     public  double evaluateExpression(String expression) throws NumberFormatException, DivideByZeroException {
-        expression=removeWhiteSpace(expression);
+        // used for the removal of the white space from the expression
+        expression=RegexMatcher(expression, Type.WHITE_SPACE).replaceAll("");
         boolean isvalid=isValidExpression(expression);
         if (!isvalid){
             throw new NumberFormatException(invalid_expression);
         }
-
         // converting the String expression into the String array using the regex
         List<Literal> literals=getArrayOfString(expression);
         for(int index =0; index<literals.size();index++) {
@@ -80,7 +78,6 @@ public class Calculator{
                 performOperationOnStack(literals.get(index).value);
             }
         }
-
         double answer=finalResult();
         return answer;
     }
@@ -184,8 +181,10 @@ public class Calculator{
         Pattern RegexPattern = null;
         if (type==Type.DIGIT){
             RegexPattern = Pattern.compile(digitRegex);
-        }else{
+        }else if (type==Type.OPERATOR){
             RegexPattern=Pattern.compile(operatorRegex);
+        }else{
+            RegexPattern=Pattern.compile(spaceRegex);
         }
         Matcher match = RegexPattern.matcher(substr);
         return match;
@@ -210,7 +209,7 @@ public class Calculator{
     }
 
     enum Type {
-        DIGIT, OPERATOR
+        DIGIT, OPERATOR,WHITE_SPACE
     }
 
 }
