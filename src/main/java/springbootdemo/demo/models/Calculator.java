@@ -65,18 +65,14 @@ public class Calculator{
 
     // used for the evaluating the expression
     public  double evaluateExpression(String expression) throws NumberFormatException, DivideByZeroException {
-
-        Stack<Double> numbers = new Stack<>();
+         Stack<Double> numbers = new Stack<>();
          Stack<String> operations = new Stack<>();
-
          // used for the removal of the white space from the expression
         expression=regexMatcher(expression, Type.WHITE_SPACE).replaceAll("");
-
         boolean isvalid=isValidExpression(expression);
         if (!isvalid){
             throw new NumberFormatException(invalid_expression);
         }
-
         // converting the String expression into the String array using the regex
         List<Literal> literals=parseLexically(expression);
         for (Literal literal : literals) {
