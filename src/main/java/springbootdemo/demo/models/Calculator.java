@@ -71,6 +71,7 @@ public class Calculator{
     public  double evaluateExpression(String expression) throws NumberFormatException, DivideByZeroException {
         // used for the removal of the white space from the expression
         expression=regexMatcher(expression, Type.WHITE_SPACE).replaceAll("");
+
         boolean isvalid=isValidExpression(expression);
         if (!isvalid){
             throw new NumberFormatException(invalid_expression);
@@ -79,7 +80,11 @@ public class Calculator{
         List<Literal> literals=getArrayOfString(expression);
         for (Literal literal : literals) {
             if (literal.type == Type.DIGIT) {
-                numbers.push(Double.parseDouble(literal.value));
+                Double num=(Double.parseDouble(literal.value));
+                if (num.isInfinite()){
+                      throw new NumberFormatException("Unable to parse the expression");
+                }
+                numbers.push(num);
             } else {
                 performOperationOnStack(literal.value);
             }
@@ -112,7 +117,7 @@ public class Calculator{
         return numbers.pop();
     }
 
-    private void performOperationOnStack(String c){
+    private void performOperationOnStack(String c) throws NumberFormatException{
         while(!operations.isEmpty() && precedence_of_operator(c)<=precedence_of_operator(operations.peek())){
             double output = performOperation();
             numbers.push(output);
@@ -136,7 +141,10 @@ public class Calculator{
     }
 
     // to perform the opeartion .
-    private   double performOperation() {
+    private   double performOperation() throws NumberFormatException {
+        if (numbers.size()==1 || numbers.isEmpty()){
+            throw new NumberFormatException("Unable to parse the expression");
+        }
         double a = numbers.pop();
         double b = numbers.pop();
         String operation = operations.pop();
@@ -211,5 +219,4 @@ public class Calculator{
     enum Type {
         DIGIT, OPERATOR,WHITE_SPACE
     }
-
 }

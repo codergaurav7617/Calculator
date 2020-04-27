@@ -1,12 +1,13 @@
 package springbootdemo.demo.exception;
-public class DivdeByZeroException extends RuntimeException {
+
+public class DivideByZeroException extends RuntimeException {
     private static final long serialVersionUID = -470180507998010368L;
 
-    public DivdeByZeroException(){
+    public DivideByZeroException(){
         super();
     }
 
-    public  DivdeByZeroException(final String message) {
+    public DivideByZeroException(final String message) {
         super(message);
     }
 }
