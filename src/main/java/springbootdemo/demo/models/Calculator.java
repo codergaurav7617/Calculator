@@ -76,8 +76,9 @@ public class Calculator{
         if (!isvalid){
             throw new NumberFormatException(invalid_expression);
         }
+
         // converting the String expression into the String array using the regex
-        List<Literal> literals=getArrayOfString(expression);
+        List<Literal> literals=parseLexically(expression);
         for (Literal literal : literals) {
             if (literal.type == Type.DIGIT) {
                 Double num=(Double.parseDouble(literal.value));
@@ -162,7 +163,7 @@ public class Calculator{
         return 0;
     }
 
-    public static List<Literal> getArrayOfString(String a) {
+    public static List<Literal> parseLexically(String a) {
         return getLiterals(a, 0);
     }
 
