@@ -34,10 +34,6 @@ public class Calculator{
 
     private static final Pattern spaceRegexPattern = Pattern.compile(spaceRegex);
 
-    private final Stack<Double> numbers = new Stack<>();
-
-    private final Stack<String> operations = new Stack<>();
-
     // used for the performing the airthmetic operation
     public double calculateResult(double first_number,double second_number,String operator) throws DivideByZeroException, NumberFormatException {
         double result;
@@ -69,7 +65,11 @@ public class Calculator{
 
     // used for the evaluating the expression
     public  double evaluateExpression(String expression) throws NumberFormatException, DivideByZeroException {
-        // used for the removal of the white space from the expression
+
+        Stack<Double> numbers = new Stack<>();
+         Stack<String> operations = new Stack<>();
+
+         // used for the removal of the white space from the expression
         expression=regexMatcher(expression, Type.WHITE_SPACE).replaceAll("");
 
         boolean isvalid=isValidExpression(expression);
@@ -87,10 +87,10 @@ public class Calculator{
                 }
                 numbers.push(num);
             } else {
-                performOperationOnStack(literal.value);
+                performOperationOnStack(numbers,operations,literal.value);
             }
         }
-        return finalResult();
+        return finalResult(numbers,operations);
     }
 
    // For checking whether the given expression is valid or not
@@ -104,12 +104,12 @@ public class Calculator{
         return true;
     }
 
-    private double finalResult() throws NumberFormatException {
+    private double finalResult(Stack<Double> numbers,Stack<String> operations) throws NumberFormatException {
         while(!operations.isEmpty()){
             if (numbers.isEmpty()){
                 throw new NumberFormatException(invalid_expression);
             }
-            double output = performOperation();
+            double output = performOperation(numbers,operations);
             numbers.push(output);
         }
         if (numbers.isEmpty()){
@@ -118,9 +118,9 @@ public class Calculator{
         return numbers.pop();
     }
 
-    private void performOperationOnStack(String c) throws NumberFormatException{
+    private void performOperationOnStack(Stack<Double> numbers,Stack<String> operations,String c) throws NumberFormatException{
         while(!operations.isEmpty() && precedence_of_operator(c)<=precedence_of_operator(operations.peek())){
-            double output = performOperation();
+            double output = performOperation(numbers,operations);
             numbers.push(output);
         }
         operations.push(c);
@@ -142,7 +142,7 @@ public class Calculator{
     }
 
     // to perform the opeartion .
-    private   double performOperation() throws NumberFormatException {
+    private   double performOperation(Stack<Double> numbers,Stack<String> operations) throws NumberFormatException {
         if (numbers.size()==1 || numbers.isEmpty()){
             throw new NumberFormatException("Unable to parse the expression");
         }
